@@ -1,0 +1,23 @@
+{
+    "name": "mhd-jalilvand/php-dbml-parser",
+    "description": "PHP Parser for database markup language (dbml)",
+    "type": "library",
+    "require": {
+        "php": "^7.1"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Dbml\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mehdi Jalilvand",
+            "email": "mhd.jalilvand@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+    }
+}
