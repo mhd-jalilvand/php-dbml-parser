@@ -1,5 +1,5 @@
 <?php
-namespace Parser;
+namespace Parser\Table;
 
 use Parser\Table;
 use Parser\Relation;

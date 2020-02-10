@@ -1,8 +1,8 @@
 <?php
-namespace Parser;
+namespace DbmlParser\Parser\Table;
 
-use Parser\Column;
-use Parser\Relation;
+use Column;
+use Relation;
 
 
 /**
@@ -29,7 +29,7 @@ class Table
   /**
    * @var string
    */
-  public comment;
+  public $comment;
   
   /**
    * Table constructor.
