@@ -1,8 +1,8 @@
 <?php
-namespace DbmlParser\Parser\Table;
+namespace DbmlParser\Parser;
 
-use Column;
-use Relation;
+use DbmlParser\Parser\Column;
+use DbmlParser\Parser\Relation;
 
 
 /**
@@ -39,12 +39,11 @@ class Table
    * @param Column[] $columns
    * @throws Exception
    */
-  public function __construct(string $name,string $alias,string $table_props,array $columns)
+  public function __construct(string $name,?string $alias = null,?string $table_props = null)
   {
       $this->name = $name;
       $this->alias = $alias;
       $this->table_props = $table_props;
-      $this->columns = $columns;
   }
   
 }

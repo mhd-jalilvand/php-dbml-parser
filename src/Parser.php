@@ -106,7 +106,6 @@ class Parser
               3: column properties
           ]
           */
-          
           $table = new Table($name,$alias,$table_props);
           foreach($columns as $column_item){
             $table->column[] = new Column($table,$column_item[1],$column_item[2],$column_item[3]);
