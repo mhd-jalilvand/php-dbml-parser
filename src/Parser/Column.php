@@ -37,7 +37,7 @@ class Column
   public $comment;
   
   /**
-   * Table constructor.
+   * column constructor.
    * @param Table $table
    * @param string $name
    * @param string $type
@@ -50,6 +50,13 @@ class Column
       $this->name = $name;
       $this->type = $type;
 
+  }
+  /**
+  * Override method to display column name as string 
+  * @return string
+  */
+  public function __toString():string{
+    return $this->name;
   }
   
 }
