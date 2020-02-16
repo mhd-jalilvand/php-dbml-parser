@@ -12,8 +12,14 @@ composer require mhd-jalilvand/php-dbml-parser
 ```php
 <?php
 require 'vendor/autoload.php';
- 
 use DbmlParser\Parser;
-
 $parser = new Parser('tests/test.dbml');
+foreach($parser->tables as $table){
+  echo $table->name.':['.implode(',',$table->columns).']'.PHP_EOL;
+}
+```
+Results:
+```
+posts:[id,title]
+comments:[id,comment,post_id]
 ```
