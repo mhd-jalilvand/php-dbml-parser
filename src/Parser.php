@@ -55,7 +55,12 @@ class Parser
       if($name=='tables'){
         return $this->_tables;
       }
-      else return null;
+      //access table by Table's name
+      else foreach($this->tables as $table){
+        if($table->name==$name)
+          return $table;
+      }
+      return null;
     }
 
     /**
