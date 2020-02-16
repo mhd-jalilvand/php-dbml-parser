@@ -1,3 +1,10 @@
-table test1 {
+table posts {
   id int [pk, increment]
+  title varchar [not null]
+}
+
+table comments {
+  id int [pk,increment]
+  comment varchar []
+  post_id int [ref: > posts.id]
 }

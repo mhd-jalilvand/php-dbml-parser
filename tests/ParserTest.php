@@ -15,18 +15,24 @@ final class ParserTest extends TestCase
           Parser::class,
           $parser
       );
+    }
+    
+    public function testTablesIsArray(): void
+    {
+      $parser = new parser('tests/test.dbml');
       $this->assertInternalType(
         'array',
           $parser->tables
       );
-      
     }
+    
+    
     public function testTableExists(): void
     {
       $parser = new parser('tests/test.dbml');
       $this->assertInstanceOf(
         Parser\Table::class,
-          $parser->test1
+          $parser->posts
       );      
      
     }
@@ -37,5 +43,14 @@ final class ParserTest extends TestCase
       $this->assertNull(
           $parser->not_exists_table
       );      
+    }
+    
+    public function testTableColumns(): void
+    {
+      $parser = new parser('tests/test.dbml');
+      $this->assertArraySubset(
+        ['id','title'],
+          $parser->posts->columns
+      );  
     }
 }
