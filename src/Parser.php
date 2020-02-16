@@ -113,7 +113,7 @@ class Parser
           */
           $table = new Table($name,$alias,$table_props);
           foreach($columns as $column_item){
-            $table->column[] = new Column($table,$column_item[1],$column_item[2],$column_item[3]);
+            $table->columns[] = new Column($table,$column_item[1],$column_item[2],$column_item[3]);
           }
           $result[] = $table;
       }
