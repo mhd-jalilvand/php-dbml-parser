@@ -36,7 +36,6 @@ class Table
    * @param string $name
    * @param string $alias
    * @param string $table_props
-   * @param Column[] $columns
    * @throws Exception
    */
   public function __construct(string $name,?string $alias = null,?string $table_props = null)
