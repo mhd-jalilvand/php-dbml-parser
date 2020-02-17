@@ -113,7 +113,9 @@ class Parser
           */
           $table = new Table($name,$alias,$table_props);
           foreach($columns as $column_item){
-            $table->columns[] = new Column($table,$column_item[1],$column_item[2],$column_item[3]);
+            $column_properties = [];
+            preg_match_all('/pk|increment|not null|ref:\s*[-><]\s+\w+\.\w+/im', $column_item[3], $column_properties);
+            $table->columns[] = new Column($table,$column_item[1],$column_item[2],(!empty($column_properties[0]))?$column_properties[0]:[]);
           }
           $result[] = $table;
       }

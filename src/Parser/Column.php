@@ -19,7 +19,7 @@ class Column
   /**
    * @var Table
    */
-  public $table;
+  protected $table;
   
   /**
    * @var string
@@ -44,11 +44,12 @@ class Column
    * @param string $properties
    * @throws Exception
    */
-  public function __construct(Table $table,string $name,string $type,string $properties)
+  public function __construct(Table $table,string $name,string $type,array $properties)
   {
       $this->table = $table;
       $this->name = $name;
       $this->type = $type;
+      $this->properties = $properties;
 
   }
   /**
@@ -57,6 +58,15 @@ class Column
   */
   public function __toString():string{
     return $this->name;
+  }
+  
+  /**
+  * Override method to access readonly properties 
+  * @return mixed
+  */
+  public function __get(string $name){
+    if($name=='table')
+      return $this->table;
   }
   
 }
