@@ -27,9 +27,17 @@ class Column
   public $type;
   
   /**
-   * @var array
+   * @var boolean
    */
-  public $properties = [];
+  public $PK;
+  /**
+   * @var boolean
+   */
+  public $NotNull;
+  /**
+   * @var boolean
+   */
+  public $Increment;
   
   /**
    * @var string
@@ -44,12 +52,21 @@ class Column
    * @param string $properties
    * @throws Exception
    */
-  public function __construct(Table $table,string $name,string $type,array $properties)
+  public function __construct(Table $table,string $name,string $type,array $properties,&$ref)
   {
       $this->table = $table;
       $this->name = $name;
       $this->type = $type;
-      $this->properties = $properties;
+      foreach($properties as $propery)
+      if(!empty($propery[0]) && strtolower($propery[0])=='pk')
+        $this->PK = true;
+      if(!empty($propery[0]) && strtolower($propery[0])=='not null')
+        $this->NotNull = true;
+      if(!empty($propery[0]) && strtolower($propery[0])=='increment')
+        $this->Increment = true;
+      if(!empty($propery[2]) && strtolower($propery[2])=='ref')
+        $ref = [$propery[3],$propery[4],$propery[5]];
+      
 
   }
   /**

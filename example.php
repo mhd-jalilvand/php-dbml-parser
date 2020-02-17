@@ -12,6 +12,5 @@ echo 'Relations:'.PHP_EOL;
 foreach($parser->relations as $relation){
   echo $relation->table->name.'.'.$relation->column->name;
   echo ' '.$relation->type.' ';
-  echo $relation->foreign_table->name.'.'.$relation->foreign_column->name.' : ';
-  echo PHP_EOL;
+  echo $relation->foreign_table->name.'.'.$relation->foreign_column->name.PHP_EOL;
 }

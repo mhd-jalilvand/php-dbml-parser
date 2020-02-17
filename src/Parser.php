@@ -95,11 +95,11 @@ class Parser
      */
     private function parse_dbml(string $raw_data)
     {
-      $result = [];
+      $relation_queues = [];
       $w = '"\w+"|\w+';
       $reg_table  = '/table\s+('.$w.')\s*(\s*as\s+[\w]+|\s*as\s+"[\w]+"|)(\s\[.*]|)\s*{(\s|\n|[^}]*)}/im';
       $reg_column = '/('.$w.')+\s+('.$w.')(\s+\[[^]]*]|)[ ]*\n/im';
-      $reg_column_properties = '/pk|increment|not null|ref:\s*[-><]\s+'.$w.'\.'.$w.'/im';
+      $reg_column_properties = '/pk|increment|not null|((ref)\s*:\s*([<>-])\s*('.$w.')\.('.$w.'))/im';
       $reg_relations = '/ref:\s*('.$w.')\.('.$w.')\s+([-<>])\s+('.$w.')\.('.$w.')/im';
       
       
@@ -132,14 +132,36 @@ class Parser
           $table = new Table($name,$alias,$table_props);
           foreach($columns as $column_item){
             $column_properties = [];
-            preg_match_all($reg_column_properties, $column_item[3], $column_properties);
             
-            $table->columns[] = new Column(
+            preg_match_all($reg_column_properties, $column_item[3], $column_properties,PREG_SET_ORDER);
+            /*
+            $column_properties must be an array, each one as:
+            array[
+              0:array of properties 
+              if property is ref then it must be like:
+              array[
+                0:ref
+                1:foreign_table
+                2:foreign_column
+              ]
+            ]
+            */
+            
+            $ref = null;
+            $column = new Column(
               $table,
               $column_item[1],
               $column_item[2],
-              (!empty($column_properties[0]))?$column_properties[0]:[]
+              $column_properties,
+              $ref
             );
+            
+            $table->columns[] = $column;
+            
+            //if there is foreign key refrence in column 
+            //add it to the queue to be added in the relations
+            if(!empty($ref))
+              $relation_queues[] = [$table,$column,$ref];
           }
           $this->_tables[] = $table;
       }
@@ -174,6 +196,22 @@ class Parser
             $column,
             $type,
             $foreign_table,
+            $foreign_column
+          );
+      }
+      
+      foreach($relation_queues as $relation_queue){
+        $foreign_table = $relation_queue[2][1];
+        $foreign_table = $this->$foreign_table;
+        
+        $foreign_column = $relation_queue[2][2];
+        $foreign_column =  $foreign_table->$foreign_column;
+        
+        $this->_relations[] = new Relation(
+            $relation_queue[0],
+            $relation_queue[1],
+            new Relationtype($relation_queue[2][0]),
+          $foreign_table,
             $foreign_column
           );
       }

@@ -53,4 +53,13 @@ final class ParserTest extends TestCase
           $parser->posts->columns
       );  
     }
+    
+    public function testTableRelations(): void
+    {
+      $parser = new parser('tests/test.dbml');
+      $this->assertCount(
+        3,
+          $parser->relations
+      );  
+    }
 }
