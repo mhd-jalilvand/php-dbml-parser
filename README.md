@@ -15,11 +15,20 @@ require 'vendor/autoload.php';
 use DbmlParser\Parser;
 $parser = new Parser('tests/test.dbml');
 foreach($parser->tables as $table){
-  echo $table->name.':['.implode(',',$table->columns).']'.PHP_EOL;
+  echo $table->name.':'.PHP_EOL;
+  foreach($table->columns as $column){
+    echo "\t".json_encode($column).PHP_EOL;
+  }
 }
 ```
 Results:
 ```
-posts:[id,title]
-comments:[id,comment,post_id]
+posts:
+        {"name":"id","type":"int","properties":["pk","increment"],"comment":null}
+        {"name":"title","type":"varchar","properties":["not null"],"comment":null}
+comments:
+        {"name":"id","type":"int","properties":["pk","increment"],"comment":null}
+        {"name":"comment","type":"varchar","properties":[],"comment":null}
+        {"name":"post_id","type":"int","properties":["ref: > posts.id"],"comment":null}
+
 ```
