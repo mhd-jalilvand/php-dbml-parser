@@ -45,4 +45,18 @@ class Table
       $this->table_props = $table_props;
   }
   
+  /**
+   * Table __get magic function
+   * @param string $name
+   * @throws Exception
+   */    
+  public function __get($name){
+    $name_striped = str_replace(['"',"'"],'',$name);
+    //access column by Column's name
+    foreach($this->columns as $column){
+      if($column->name==$name || $column->name==$name_striped)
+        return $column;
+    }
+    return null;
+  }  
 }

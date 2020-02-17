@@ -5,6 +5,23 @@ table posts {
 
 table comments {
   id int [pk,increment]
-  comment varchar []
+  comment varchar 
   post_id int [ref: > posts.id]
 }
+table tags{
+  id int [pk, increment, not null]
+  title varchar [not null]
+}
+
+table post_tags{
+  id int [pk]
+  post_id int
+  tag_id int
+}
+
+
+
+
+Ref: "tags"."id" < "post_tags"."tag_id"
+
+Ref: "posts"."id" < "post_tags"."post_id"

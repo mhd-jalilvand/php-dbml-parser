@@ -4,6 +4,7 @@ namespace DbmlParser;
 use DbmlParser\Parser\Table;
 use DbmlParser\Parser\Column;
 use DbmlParser\Parser\Relation;
+use DbmlParser\Parser\Relationtype;
 
 /**
  * Class Parser
@@ -20,6 +21,11 @@ class Parser
      * @var Table[]
      */
     protected $_tables = [];
+    
+    /**
+     * @var Relation[]
+     */
+    protected $_relations = [];
 
     /**
      * Parser constructor.
@@ -52,12 +58,17 @@ class Parser
      * @throws Exception
      */    
     public function __get($name){
+      $name_striped = str_replace(['"',"'"],'',$name);
       if($name=='tables'){
         return $this->_tables;
       }
+      
+      else if($name=='relations'){
+        return $this->_relations;
+      }
       //access table by Table's name
       else foreach($this->tables as $table){
-        if($table->name==$name)
+        if($table->name==$name || $table->name==$name_striped)
           return $table;
       }
       return null;
@@ -72,7 +83,7 @@ class Parser
         $dbml = file_get_contents($this->filename);
         
         //tables: array key:table name and value Table object
-        $this->_tables = $this->parse_dbml(  $dbml );
+      $this->parse_dbml(  $dbml );
 
         return $this;
     }
@@ -82,14 +93,19 @@ class Parser
      * @return array
      * @throws Exception
      */
-    private function parse_dbml(string $raw_data): Array
+    private function parse_dbml(string $raw_data)
     {
       $result = [];
-
-      $reg_table  = '/table\s+("[\w]+"|[\w]+)\s*(\s*as\s+[\w]+|\s*as\s+"[\w]+"|)(\s\[.*]|)\s*{(\s|\n|[^}]*)}/im';
-      $reg_column = '/("[\w]+"|[\w]+)+\s+("[\w]+"|[\w]+)(\s+\[[^]]*]|)[ ]*\n/im';
-      $reg_column_properties = '/pk|increment|not null|ref:\s*[-><]\s+\w+\.\w+/im';
+      $w = '"\w+"|\w+';
+      $reg_table  = '/table\s+('.$w.')\s*(\s*as\s+[\w]+|\s*as\s+"[\w]+"|)(\s\[.*]|)\s*{(\s|\n|[^}]*)}/im';
+      $reg_column = '/('.$w.')+\s+('.$w.')(\s+\[[^]]*]|)[ ]*\n/im';
+      $reg_column_properties = '/pk|increment|not null|ref:\s*[-><]\s+'.$w.'\.'.$w.'/im';
+      $reg_relations = '/ref:\s*('.$w.')\.('.$w.')\s+([-<>])\s+('.$w.')\.('.$w.')/im';
+      
+      
       preg_match_all($reg_table, $raw_data, $tables, PREG_SET_ORDER);
+      preg_match_all($reg_relations, $raw_data, $relations, PREG_SET_ORDER);
+      
       /*
       $tables must be an array, each one as:
         array[
@@ -103,7 +119,7 @@ class Parser
       foreach ($tables as $item) {
         $alias = $table_props = $columns = null;
           $name = trim($item[1]);
-          preg_match_all($reg_column, $item[4], $columns,PREG_SET_ORDER);
+          preg_match_all($reg_column, $item[4], $columns,PREG_SET_ORDER);          
           /*
           $columns must be an array, each one as:
             array[
@@ -117,6 +133,7 @@ class Parser
           foreach($columns as $column_item){
             $column_properties = [];
             preg_match_all($reg_column_properties, $column_item[3], $column_properties);
+            
             $table->columns[] = new Column(
               $table,
               $column_item[1],
@@ -124,10 +141,44 @@ class Parser
               (!empty($column_properties[0]))?$column_properties[0]:[]
             );
           }
-          $result[] = $table;
+          $this->_tables[] = $table;
       }
       
-      return $result;
+      /*
+      $relation must be an array, each one as:
+        array[
+          0: raw data 
+          1: primery table 
+          2: primery column
+          3: relation type
+          4: foreign table
+          5: foreign column
+      ]
+      */
+      foreach($relations as  $relation)  {
+        $table = $relation[1];
+        $column = $relation[2];
+        $type = $relation[3];
+        $foreign_table = $relation[4];
+        $foreign_column = $relation[5];
+        
+        
+        $table = $this->$table ;
+        $column = $table->$column ;
+        $foreign_table = $this->$foreign_table ;
+        $foreign_column = $foreign_table->$foreign_column ;
+        $type = new Relationtype($type );
+                  
+        $this->_relations[] = new Relation(
+            $table,
+            $column,
+            $type,
+            $foreign_table,
+            $foreign_column
+          );
+      }
+      
+      return $this;
     }  
 
     
