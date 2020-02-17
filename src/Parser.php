@@ -86,8 +86,10 @@ class Parser
     {
       $result = [];
 
-      $re = '/table\s+("[\w]+"|[\w]+)\s*(\s*as\s+[\w]+|\s*as\s+"[\w]+"|)(\s\[.*]|)\s*{(\s|\n|[^}]*)}/im';
-      preg_match_all($re, $raw_data, $tables, PREG_SET_ORDER);
+      $reg_table  = '/table\s+("[\w]+"|[\w]+)\s*(\s*as\s+[\w]+|\s*as\s+"[\w]+"|)(\s\[.*]|)\s*{(\s|\n|[^}]*)}/im';
+      $reg_column = '/("[\w]+"|[\w]+)+\s+("[\w]+"|[\w]+)(\s+\[[^]]*]|)[ ]*\n/im';
+      $reg_column_properties = '/pk|increment|not null|ref:\s*[-><]\s+\w+\.\w+/im';
+      preg_match_all($reg_table, $raw_data, $tables, PREG_SET_ORDER);
       /*
       $tables must be an array, each one as:
         array[
@@ -101,7 +103,7 @@ class Parser
       foreach ($tables as $item) {
         $alias = $table_props = $columns = null;
           $name = trim($item[1]);
-          preg_match_all('/("[\w]+"|[\w]+)+\s+("[\w]+"|[\w]+)(\s+\[[^]]*]|)[ ]*\n/im', $item[4], $columns,PREG_SET_ORDER);
+          preg_match_all($reg_column, $item[4], $columns,PREG_SET_ORDER);
           /*
           $columns must be an array, each one as:
             array[
@@ -114,8 +116,13 @@ class Parser
           $table = new Table($name,$alias,$table_props);
           foreach($columns as $column_item){
             $column_properties = [];
-            preg_match_all('/pk|increment|not null|ref:\s*[-><]\s+\w+\.\w+/im', $column_item[3], $column_properties);
-            $table->columns[] = new Column($table,$column_item[1],$column_item[2],(!empty($column_properties[0]))?$column_properties[0]:[]);
+            preg_match_all($reg_column_properties, $column_item[3], $column_properties);
+            $table->columns[] = new Column(
+              $table,
+              $column_item[1],
+              $column_item[2],
+              (!empty($column_properties[0]))?$column_properties[0]:[]
+            );
           }
           $result[] = $table;
       }
