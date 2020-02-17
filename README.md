@@ -7,6 +7,10 @@ file and parse it using this script to parse it.
 ## Installation
 ```
 composer require mhd-jalilvand/php-dbml-parser
+cp  vendor/mhd-jalilvand/php-dbml-parser/example.php example.php
+cp  vendor/mhd-jalilvand/php-dbml-parser/tests -r tests
+php  example.php
+
 ```
 ## Usage
   tests/test.dbml contains a sample database schema as:
